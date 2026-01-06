@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Militia – ചളി Commando</title>
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #87ceeb;
+  overflow: hidden;
+}
+#game {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+#player {
+  width: 50px;
+  height: 50px;
+  background: green;
+  border-radius: 10px;
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+.enemy {
+  width: 40px;
+  height: 40px;
+  background: red;
+  border-radius: 50%;
+  position: absolute;
+}
+#score {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 20px;
+}
+#dialogue {
+  position: absolute;
+  bottom: 80px;
+  left: 10px;
+  background: white;
+  padding: 6px;
+  border-radius: 6px;
+}
+</style>
+</head>
+
+<body>
+<div id="game">
+  <div id="score">Score: 0</div>
+  <div id="dialogue">കുഞ്ഞപ്പി കമാൻഡോ: "റെഡി!"</div>
+  <div id="player"></div>
+</div>
+
+<script>
+const player = document.getElementById("player");
+const game = document.getElementById("game");
+const scoreBox = document.getElementById("score");
+const dialogueBox = document.getElementById("dialogue");
+
+let score = 0;
+let jumping = false;
+
+const dialogues = [
+ "കുഞ്ഞപ്പി: എടാ നില്ലെടാ!",
+ "വട്ടു വാസു: ഇത് എൻ്റെ ഏരിയ!",
+ "സാദനം: ഡിസിപ്ലിൻ കാണിക്ക്!",
+ "ബാബു: പൊളിച്ചു!"
+];
+
+function jump() {
+ if (jumping) return;
+ jumping = true;
+ let up = 0;
+ const jumpUp = setInterval(() => {
+   if (up >= 100) {
+     clearInterval(jumpUp);
+     const fall = setInterval(() => {
+       if (up <= 0) {
+         clearInterval(fall);
+         jumping = false;
+       }
+       up -= 5;
+       player.style.bottom = 20 + up + "px";
+     }, 20);
+   }
+   up += 5;
+   player.style.bottom = 20 + up + "px";
+ }, 20);
+}
+
+document.body.addEventListener("click", jump);
+
+function spawnEnemy() {
+ const enemy = document.createElement("div");
+ enemy.classList.add("enemy");
+ enemy.style.left = "100%";
+ enemy.style.bottom = "20px";
+ game.appendChild(enemy);
+
+ let move = setInterval(() => {
+   let left = enemy.offsetLeft;
+   if (left < 60) {
+     clearInterval(move);
+     game.removeChild(enemy);
+   } else {
+     enemy.style.left = left - 5 + "px";
+   }
+
+   if (
+     left < 70 &&
+     player.offsetTop < enemy.offsetTop + 40
+   ) {
+     score++;
+     scoreBox.innerText = "Score: " + score;
+     dialogueBox.innerText =
+       dialogues[Math.floor(Math.random() * dialogues.length)];
+     clearInterval(move);
+     game.removeChild(enemy);
+   }
+ }, 30);
+}
+
+setInterval(spawnEnemy, 2000);
+</script>
+</body>
+</html>
