@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>രാജു Street Fight – Malayalam Voice</title>
+<style>
+body { margin:0; overflow:hidden; font-family:sans-serif; background:#111; }
+#game { width:100vw; height:100vh; position:relative; background:linear-gradient(#444,#222); }
+#road { position:absolute; bottom:0; width:200%; height:60px; background:#333; animation:move 2s linear infinite; }
+@keyframes move { from { left:0; } to { left:-100%; } }
+#player { width:50px; height:50px; background:orange; border-radius:10px; position:absolute; bottom:60px; left:40px; }
+.obstacle, .power { width:40px; height:40px; position:absolute; bottom:60px; right:-50px; border-radius:8px; }
+.obstacle { background:red; } .power { background:lime; }
+#score { position:absolute; top:10px; left:10px; color:white; font-size:20px; }
+#bubble { position:absolute; top:80px; left:20px; background:white; padding:6px 10px; border-radius:10px; display:none; }
+#msg { position:absolute; top:40%; width:100%; text-align:center; color:white; font-size:26px; display:none; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="score">Score: 0</div>
+  <div id="bubble"></div>
+  <div id="player"></div>
+  <div id="road"></div>
+  <div id="msg">😵 രാജു വീണു!<br>Tap to Restart</div>
+</div>
+
+<audio id="jumpSound" src="data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAA..." preload="auto"></audio>
+<audio id="hitSound" src="data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAA..." preload="auto"></audio>
+<audio id="powerSound" src="data:audio/mpeg;base64,//uQxAAAAAAAAAAAAAAAAAAAA..." preload="auto"></audio>
+
+<script>
+const player = document.getElementById("player");
+const game = document.getElementById("game");
+const scoreBox = document.getElementById("score");
+const msg = document.getElementById("msg");
+const bubble = document.getElementById("bubble");
+const jumpSound = document.getElementById("jumpSound");
+const hitSound = document.getElementById("hitSound");
+const powerSound = document.getElementById("powerSound");
+
+let y = 60, vy = 0, jumping = false;
+let score = 0, gameOver = false;
+let shield = false;
+
+document.body.addEventListener("click", () => {
+  if(gameOver) restart();
+  else if(!jumping){
+    vy = 15; jumping = true;
+    jumpSound.play();
+    showBubble("വെടി കൊടുക്കാം!");
+  }
+});
+
+function showBubble(text){
+  bubble.innerText = text;
+  bubble.style.display="block";
+  setTimeout(()=>bubble.style.display="none",800);
+}
+
+function spawnObstacle(){
+  if(gameOver) return;
+  const o = document.createElement("div");
+  o.className = Math.random()<0.5?"obstacle":"power";
+  game.appendChild(o);
+
+  let move = setInterval(()=>{
+    let x = o.offsetLeft - (6 + score/20);
+    o.style.left = x + "px";
+
+    if(x<90 && x>30 && y<=60){
+      if(o.className==="power"){
+        shield=true;
+        powerSound.play();
+        showBubble("ശീൽഡ് സജീവം!");
+        game.removeChild(o);
+        clearInterval(move);
+      } else {
+        if(shield){
+          shield=false;
+          showBubble("🛡️ രക്ഷപ്പെട്ടു!");
+          game.removeChild(o);
+          clearInterval(move);
+        } else {
+          endGame();
+        }
+      }
+    }
+    if(x<-50){ score++; scoreBox.innerText="Score: "+score; game.removeChild(o); clearInterval(move);}
+  },20);
+}
+
+function physics(){
+  vy -=1;
+  y += vy;
+  if(y<=60){ y=60; jumping=false; }
+  player.style.bottom=y+"px";
+}
+
+function endGame(){
+  gameOver=true;
+  msg.style.display="block";
+  hitSound.play();
+  showBubble("അയ്യോ!");
+}
+
+function restart(){
+  score=0; shield=false; gameOver=false; msg.style.display="none";
+  scoreBox.innerText="Score: 0";
+  document.querySelectorAll(".obstacle,.power").forEach(e=>e.remove());
+}
+
+setInterval(()=>{ if(!gameOver) physics(); },20);
+setInterval(spawnObstacle,1500);
+</script>
+</body>
+</html>
