@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ചളി Mode</title>
+<style>
+body {
+  background:#0f172a;
+  color:white;
+  font-family:sans-serif;
+  text-align:center;
+  padding:15px;
+}
+.box {
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  margin:10px;
+}
+button {
+  font-size:16px;
+  padding:12px;
+  margin:6px;
+  border-radius:10px;
+}
+#log {
+  min-height:90px;
+  margin-top:10px;
+  background:#020617;
+  padding:10px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🤣 കുഞ്ഞപ്പി vs ബോംബ ബാബു</h2>
+
+<div class="box">
+  <p>🪖 കുഞ്ഞപ്പി Energy: <span id="p1">100</span></p>
+  <p>🤯 ബോംബ ബാബു Energy: <span id="p2">100</span></p>
+</div>
+
+<div class="box">
+  <button onclick="attack()">💥 ചളി Attack</button>
+  <button onclick="defend()">🛡️ ഡിഫൻസ്</button>
+  <button onclick="talk()">🗣️ ഡയലോഗ്</button>
+  <button onclick="special()">🤯 Special</button>
+</div>
+
+<div id="log"></div>
+
+<script>
+let p1 = 100;
+let p2 = 100;
+
+function update() {
+ document.getElementById("p1").innerText = p1;
+ document.getElementById("p2").innerText = p2;
+
+ if (p1 <= 0 || p2 <= 0) {
+   document.getElementById("log").innerText =
+    "🎉 കളി തീർന്നു! ഇരുവരും ചായക്കടയിൽ ☕😂";
+ }
+}
+
+function random(min,max){
+ return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function attack() {
+ let dmg = random(5,25);
+ p2 -
